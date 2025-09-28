@@ -194,7 +194,8 @@ This project is open source and available under the MIT License.
 
 ## 🙏 Acknowledgments
 
-- Built with ❤️ and AI
+- Created by kalidas kj
+- 
 - Icons by [Lucide](https://lucide.dev/)
 - Styling with [TailwindCSS](https://tailwindcss.com/)
 - AI powered by OpenRouter/Claude
