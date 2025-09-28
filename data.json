@@ -1,0 +1,71 @@
+{
+  "habits": [
+    {
+      "name": "Drink Water",
+      "streak": 1,
+      "last_done": "2025-08-28"
+    },
+    {
+      "name": "Morning Exercise",
+      "streak": 1,
+      "last_done": "2025-08-24"
+    },
+    {
+      "name": "Read for 30 minutes",
+      "streak": 0,
+      "last_done": null
+    },
+    {
+      "name": "Test Habit",
+      "streak": 1,
+      "last_done": "2025-08-24"
+    },
+    {
+      "name": "Test Habit for Testing",
+      "streak": 1,
+      "last_done": "2025-08-24"
+    },
+    {
+      "name": "piano",
+      "streak": 0,
+      "last_done": null
+    },
+    {
+      "name": "python",
+      "streak": 1,
+      "last_done": "2025-08-31"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "Finish report",
+      "done": false,
+      "date": "2025-08-24"
+    },
+    {
+      "name": "Call dentist",
+      "done": true,
+      "date": "2025-08-24"
+    },
+    {
+      "name": "Buy groceries",
+      "done": false,
+      "date": "2025-08-24"
+    },
+    {
+      "name": "Test Task for Testing",
+      "done": true,
+      "date": "2025-08-24"
+    },
+    {
+      "name": "learn python",
+      "done": true,
+      "date": "2025-08-28"
+    },
+    {
+      "name": "python learning",
+      "done": false,
+      "date": "2025-08-28"
+    }
+  ]
+}

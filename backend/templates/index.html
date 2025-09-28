@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Habit Tracker - Modern Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .streak-glow {
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+        /* Dark theme overrides */
+        :root.dark .bg-white { background-color: rgb(17 24 39) !important; }
+        :root.dark .bg-gray-50 { background-color: rgb(31 41 55) !important; }
+        :root.dark .text-gray-900 { color: rgb(243 244 246) !important; }
+        :root.dark .text-gray-700 { color: rgb(209 213 219) !important; }
+        :root.dark .text-gray-600 { color: rgb(156 163 175) !important; }
+        :root.dark .text-gray-500 { color: rgb(156 163 175) !important; }
+        :root.dark .border { border-color: rgb(55 65 81) !important; }
+        :root.dark .border-gray-200 { border-color: rgb(55 65 81) !important; }
+        :root.dark .shadow-sm, :root.dark .shadow-lg { box-shadow: 0 10px 25px rgba(0,0,0,0.35) !important; }
+        :root.dark .bg-gradient-to-r.from-blue-500.to-purple-600 { filter: saturate(1.1) brightness(0.9); }
+        :root.dark #ai-assistant .bg-gradient-to-br { 
+            background: linear-gradient(135deg, rgb(31 41 55), rgb(17 24 39)) !important; 
+            border-color: rgb(55 65 81) !important;
+        }
+        :root.dark #ai-assistant .border { border-color: rgb(55 65 81) !important; }
+        :root.dark #ai-assistant h3,
+        :root.dark #ai-assistant h4,
+        :root.dark #ai-assistant span,
+        :root.dark #ai-assistant p { color: rgb(229 231 235) !important; }
+        :root.dark #ai-assistant .bg-white { background-color: rgb(31 41 55) !important; }
+        :root.dark #ai-assistant .text-gray-700 { color: rgb(229 231 235) !important; }
+        :root.dark #ai-assistant .text-gray-600 { color: rgb(209 213 219) !important; }
+        :root.dark #ai-assistant .text-red-700 { color: rgb(0 0 0) !important; }
+        :root.dark #ai-assistant .text-yellow-700 { color: rgb(0 0 0) !important; }
+    </style>
+</head>
+<body class="bg-gray-50 font-inter text-gray-900 transition-colors">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="brain" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">AI Habit Tracker</h1>
+                        <p class="text-white/80 text-sm">Build better habits with AI-powered insights</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2 text-sm">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span id="currentDate">Loading...</span>
+                    </div>
+                    <button id="notificationToggle" class="bg-white/20 hover:bg-white/30 rounded-lg p-2 transition-colors mr-2" aria-label="Toggle notifications">
+                        <i id="notificationIcon" data-lucide="bell" class="w-5 h-5"></i>
+                    </button>
+                    <button id="themeToggle" class="bg-white/20 hover:bg-white/30 rounded-lg p-2 transition-colors" aria-label="Toggle theme">
+                        <i id="themeIcon" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- AI Greeting Banner -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="bot" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold mb-2">🤖 HabBot says:</h2>
+                    <p class="text-white/90 leading-relaxed" id="aiGreeting">
+                        Loading your personalized insights...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar -->
+            <div class="lg:w-64 flex-shrink-0">
+                <nav class="bg-white rounded-xl shadow-sm p-4 space-y-2">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
+                        Navigation
+                    </div>
+                    <a href="#habits" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary-50 text-primary-700 font-medium">
+                        <i data-lucide="target" class="w-5 h-5"></i>
+                        <span>Habits</span>
+                    </a>
+                    <a href="#tasks" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="check-square" class="w-5 h-5"></i>
+                        <span>Tasks</span>
+                    </a>
+                    <a href="#ai-assistant" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="brain" class="w-5 h-5"></i>
+                        <span>AI Assistant</span>
+                    </a>
+                    <a href="#stats" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                        <span>Statistics</span>
+                    </a>
+                    <a href="#archived" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i data-lucide="archive" class="w-5 h-5"></i>
+                        <span>Archived</span>
+                    </a>
+                </nav>
+
+                <!-- Quick Stats -->
+                <div class="bg-white rounded-xl shadow-sm p-4 mt-4">
+                    <h3 class="font-semibold text-gray-900 mb-3">Today's Progress</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Habits Done</span>
+                            <span id="statHabits" class="font-semibold text-green-600">0/0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Tasks Done</span>
+                            <span id="statTasks" class="font-semibold text-blue-600">0/0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Best Streak</span>
+                            <span id="statBestStreak" class="font-semibold text-orange-600">0 days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 space-y-6">
+                <!-- Habits Section -->
+                <section id="habits" class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="target" class="w-6 h-6 text-primary-600"></i>
+                            <span>Daily Habits</span>
+                        </h2>
+                        <button id="btnAddHabit" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Habit</span>
+                        </button>
+                    </div>
+
+                    <div id="habits-list" class="space-y-4">
+                        <div class="empty-state text-center py-8">
+                            <i data-lucide="target" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No habits yet!</h3>
+                            <p class="text-gray-500">Add your first habit to start building an amazing routine</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Archived Habits Section -->
+                <section id="archived" class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="archive" class="w-6 h-6 text-gray-600"></i>
+                            <span>Archived Habits</span>
+                        </h2>
+                    </div>
+
+                    <div id="archived-list" class="space-y-4">
+                        <div class="empty-state text-center py-8">
+                            <i data-lucide="archive" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No archived habits</h3>
+                            <p class="text-gray-500">Archived habits will appear here. You can unarchive or delete them.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tasks Section -->
+                <section id="tasks" class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="check-square" class="w-6 h-6 text-blue-600"></i>
+                            <span>Today's Tasks</span>
+                        </h2>
+                        <button id="btnAddTask" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Task</span>
+                        </button>
+                    </div>
+
+                    <div id="tasks-list" class="space-y-4">
+                        <div class="empty-state text-center py-8">
+                            <i data-lucide="check-square" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No tasks for today!</h3>
+                            <p class="text-gray-500">Add some tasks to stay productive</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Assistant Section -->
+                <section id="ai-assistant" class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                            <i data-lucide="brain" class="w-6 h-6 text-purple-600"></i>
+                            <span>AI Assistant</span>
+                        </h2>
+                        <button id="btnRefreshAI" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Get Insights</span>
+                        </button>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- AI Insights -->
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+                            <h3 class="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                                <i data-lucide="lightbulb" class="w-5 h-5 text-blue-600"></i>
+                                <span>AI Insights</span>
+                            </h3>
+                            <p class="text-gray-700 leading-relaxed" id="aiInsights">
+                                Loading AI insights...
+                            </p>
+                        </div>
+
+                        <!-- Task Prioritization -->
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+                            <h3 class="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                                <i data-lucide="target" class="w-5 h-5 text-green-600"></i>
+                                <span>Task Prioritization</span>
+                            </h3>
+                            <div class="space-y-3" id="taskPriorities">
+                                <div class="text-gray-500 text-center py-4">
+                                    <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+                                    <p>Loading priorities...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggested New Habit -->
+                    <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
+                        <h3 class="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
+                            <span>Suggested New Habit</span>
+                        </h3>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-medium text-gray-900" id="suggestedHabitTitle">Loading suggestion...</h4>
+                                <p class="text-sm text-gray-600 mt-1" id="suggestedHabitDesc">AI is thinking of a great habit for you...</p>
+                            </div>
+                            <button id="btnAddSuggestedHabit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                Add Habit
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-gray-500 text-sm">
+                <p>AI-Powered Habit & Task Tracker • Built with ❤️ and AI</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Habit Modal -->
+    <div id="addHabitModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add New Habit</h3>
+                <input type="text" id="habitInput" placeholder="Enter habit name..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4">
+                
+                <div class="mb-4">
+                    <label for="habitReminderTime" class="block text-sm font-medium text-gray-700 mb-2">Reminder Time (Optional)</label>
+                    <input type="time" id="habitReminderTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+
+                
+
+                <div class="flex space-x-3">
+                    <button id="btnSaveHabit" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Save Habit</button>
+                    <button id="btnCancelHabit" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add New Task</h3>
+                <input type="text" id="taskInput" placeholder="Enter task description..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                
+                <div class="mb-4">
+                    <label for="taskReminderTime" class="block text-sm font-medium text-gray-700 mb-2">Reminder Time (Optional)</label>
+                    <input type="time" id="taskReminderTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                
+
+                <div class="flex space-x-3">
+                    <button id="btnSaveTask" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Save Task</button>
+                    <button id="btnCancelTask" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+    <script>
+        // Theme management
+        (function initTheme() {
+            const saved = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const shouldUseDark = saved ? saved === 'dark' : systemDark;
+            document.documentElement.classList.toggle('dark', shouldUseDark);
+        })();
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('themeIcon');
+            if (!icon) return;
+            const isDark = document.documentElement.classList.contains('dark');
+            icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            const toDark = !root.classList.contains('dark');
+            root.classList.toggle('dark', toDark);
+            localStorage.setItem('theme', toDark ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+
+        // Modal management
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('notificationToggle')?.addEventListener('click', toggleNotifications);
+        document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+        document.getElementById('btnAddHabit')?.addEventListener('click', () => showModal('addHabitModal'));
+        document.getElementById('btnAddTask')?.addEventListener('click', () => showModal('addTaskModal'));
+        document.getElementById('btnCancelHabit')?.addEventListener('click', () => hideModal('addHabitModal'));
+        document.getElementById('btnCancelTask')?.addEventListener('click', () => hideModal('addTaskModal'));
+        document.getElementById('btnRefreshAI')?.addEventListener('click', () => window.loadAIInsights());
+
+        // Initialize
+        lucide.createIcons();
+        updateThemeIcon();
+
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
